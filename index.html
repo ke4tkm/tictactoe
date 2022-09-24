@@ -1,14 +1,4 @@
 <!DOCTYPE html>
-<html lang="en" >
-<head>
-  <meta charset="UTF-8">
-  <title>CodePen - 最強の三目並べAI</title>
-  <link rel="stylesheet" href="./style.css">
-
-</head>
-<body>
-<!-- partial:index.partial.html -->
-<!DOCTYPE html>
 <html lang="ja">
   <head>
     <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
@@ -63,14 +53,14 @@
         <div class="cell">
           <span id="pos-8-x" class="batu hidden">X</span>
           <span id="pos-8-o" class="maru hidden">O</span>
-          <button id="pos-8-button" pys-onclick="lambda e: cell_click(8)"></button>
+          <button id="pos-8-button"  pys-onclick="lambda e: cell_click(8)"></button>
         </div>
       </div>
-  
+      
       <h3 id="message"></h3>
       <button id="reset-button" class="hidden" pys-onclick="lambda e: reset()">もう一度</button>
     </div>
-
+    
 <py-script>
 MARKS = {0: 'X', 1: 'O'}
 
@@ -78,13 +68,17 @@ def update_cells(state):
     for i, value in enumerate(state):
         Element(f"pos-{i}-x").add_class("hidden")
         Element(f"pos-{i}-o").add_class("hidden")
+        Element(f"pos-{i}-button").add_class("hidden")  
         if value == 0:
             Element(f"pos-{i}-x").remove_class("hidden")
         elif value == 1:
             Element(f"pos-{i}-o").remove_class("hidden")
-    
+        else:
+            Element(f"pos-{i}-button").remove_class("hidden")
+  
 def display_message(value):
     Element("message").write(value)
+
 
 class Board:
     def __init__(self):
@@ -101,7 +95,7 @@ class Board:
 """
         for idx, x in enumerate(self.state):
             if x is not None:
-                text = text.replace(str(idx), MARKS[x]) # 4 → X
+                text = text.replace(str(idx), MARKS[x])  # 4 -> X
         print(text)
 
     def move(self, idx):
@@ -116,7 +110,7 @@ class Board:
     def unmove(self, idx):
         self.counter -= 1
         self.state[idx] = None
-
+    
     def is_win(self, player):
         s = self.state
         if(
@@ -145,7 +139,7 @@ class Board:
         return moves
 
 
-def minmax(board, player):
+def minimax(board, player):
     maximize_player = 0
     minimize_player = 1
 
@@ -164,7 +158,7 @@ def minmax(board, player):
 
         for idx in board.valid_moves():
             board.move(idx)
-            score, next_idx = minmax(board, opp)
+            score, next_idx = minimax(board, opp)
             if max_score < score:
                 max_score = score
                 max_idx = idx
@@ -177,20 +171,21 @@ def minmax(board, player):
 
         for idx in board.valid_moves():
             board.move(idx)
-            score, next_idx = minmax(board, opp)
+            score, next_idx = minimax(board, opp)
             if min_score > score:
                 min_score = score
                 min_idx = idx
             board.unmove(idx)
         
         return (min_score, min_idx)
-
+        
+        
 class BestPlayer:
     def __init__(self, player):
         self.player = player
-
+    
     def play(self, board):
-        score, idx = minmax(board, self.player)
+        score, idx = minimax(board, self.player)
         board.move(idx)
         return idx
 
@@ -218,9 +213,10 @@ class GameManager:
     def human_play(self, idx):
         if not self.game_running:
             return
-        
+
         self.board.move(idx)
         update_cells(self.board.state)
+
         if self.board.is_win(0):
             display_message("あなたの勝ち🎉")
             self.game_running = False
@@ -240,10 +236,11 @@ class GameManager:
         if self.board.is_win(1):
             display_message("AIの勝ち😞")
             self.game_running = False
-            Element("reset-button").remove_class("hidden")
+            Element("reset-button").remove_class("hidden")  
             return 
 
         display_message("あなたの番です")
+
 
 game_manager = GameManager()
 
@@ -252,10 +249,7 @@ def reset():
   
 def cell_click(idx):
     game_manager.human_play(idx)
+
 </py-script>
   </body>
-</html>
-<!-- partial -->
-  
-</body>
 </html>
